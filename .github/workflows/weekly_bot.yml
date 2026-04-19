@@ -1,0 +1,31 @@
+name: GitHub Trending Discord Bot
+
+on:
+  schedule:
+    # 每周日 UTC 08:00（台灣時間 16:00）
+    - cron: "0 8 * * 0"
+  workflow_dispatch:  # 允許手動觸發測試
+
+jobs:
+  send-weekly-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run bot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Actions 內建，自動提供
+        run: python bot.py
